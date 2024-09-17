@@ -23,6 +23,14 @@ namespace AillieoUtils
         [Tooltip("item的模板")]
         public RectTransform itemTemplate;
 
+        [Tooltip("Content padding")]
+        [SerializeField]
+        private RectOffset padding = new();
+
+        [Tooltip("Space between items")]
+        [SerializeField]
+        private Vector2 spacing = Vector2.zero;
+
         // 0001
         protected const int flagScrollDirection = 1;
 
@@ -61,6 +69,8 @@ namespace AillieoUtils
         private Vector3[] rectCorners = new Vector3[2];
 
         private bool applicationIsQuitting;
+
+        private Coroutine delayedUpdateCoroutine;
 
         // for hide and show
         public enum ItemLayoutType
@@ -120,7 +130,12 @@ namespace AillieoUtils
             {
                 if (this.willUpdateData == 0 && this.IsActive())
                 {
-                    this.StartCoroutine(this.DelayUpdateData());
+                    if (this.delayedUpdateCoroutine != null)
+                    {
+                        this.StopCoroutine(this.delayedUpdateCoroutine);
+                    }
+
+                    this.delayedUpdateCoroutine = this.StartCoroutine(this.DelayUpdateData());
                 }
 
                 this.willUpdateData |= 3;
@@ -159,12 +174,11 @@ namespace AillieoUtils
             }
         }
 
-        protected override void OnDisable()
-        {
-            this.initialized = false;
-            base.OnDisable();
-        }
-
+        // protected override void OnDisable()
+        // {
+        //     this.initialized = false;
+        //     base.OnDisable();
+        // }
         protected virtual void InternalScrollTo(int index)
         {
             index = Mathf.Clamp(index, 0, this.dataCount - 1);
@@ -211,6 +225,24 @@ namespace AillieoUtils
             this.ResetCriticalItems();
         }
 
+        protected override void OnRectTransformDimensionsChange()
+        {
+            base.OnRectTransformDimensionsChange();
+
+            if (Application.isPlaying)
+            {
+                this.UpdateRefRect();
+
+                for (var i = 0; i < this.managedItems.Count; i++)
+                {
+                    this.managedItems[i].rectDirty = true;
+                }
+
+                this.willUpdateData = 0;
+                this.UpdateData();
+            }
+        }
+
         protected void EnsureItemRect(int index)
         {
             if (!this.managedItems[index].rectDirty)
@@ -222,56 +254,57 @@ namespace AillieoUtils
             ScrollItemWithRect firstItem = this.managedItems[0];
             if (firstItem.rectDirty)
             {
-                Vector2 firstSize = this.GetItemSize(0);
-                firstItem.rect = CreateWithLeftTopAndSize(Vector2.zero, firstSize);
-                firstItem.rectDirty = false;
+                // Vector2 firstSize = this.GetItemSize(0);
+                // firstItem.rect = CreateWithLeftTopAndSize(Vector2.zero, firstSize);
+                // firstItem.rectDirty = false;
+                this.CalculateContentSizeAndItemPos();
             }
 
-            // 当前item之前的最近的已更新的rect
-            var nearestClean = 0;
-            for (var i = index; i >= 0; --i)
-            {
-                if (!this.managedItems[i].rectDirty)
-                {
-                    nearestClean = i;
-                    break;
-                }
-            }
-
-            // 需要更新 从 nearestClean 到 index 的尺寸
-            Rect nearestCleanRect = this.managedItems[nearestClean].rect;
-            Vector2 curPos = GetLeftTop(nearestCleanRect);
-            Vector2 size = nearestCleanRect.size;
-            this.MovePos(ref curPos, size);
-
-            for (var i = nearestClean + 1; i <= index; i++)
-            {
-                size = this.GetItemSize(i);
-                this.managedItems[i].rect = CreateWithLeftTopAndSize(curPos, size);
-                this.managedItems[i].rectDirty = false;
-                this.MovePos(ref curPos, size);
-            }
-
-            var range = new Vector2(Mathf.Abs(curPos.x), Mathf.Abs(curPos.y));
-            switch (this.layoutType)
-            {
-                case ItemLayoutType.VerticalThenHorizontal:
-                    range.x += size.x;
-                    range.y = this.refRect.height;
-                    break;
-                case ItemLayoutType.HorizontalThenVertical:
-                    range.x = this.refRect.width;
-                    if (curPos.x != 0)
-                    {
-                        range.y += size.y;
-                    }
-
-                    break;
-                default:
-                    break;
-            }
-
-            this.content.sizeDelta = range;
+            // // 当前item之前的最近的已更新的rect
+            // var nearestClean = 0;
+            // for (var i = index; i >= 0; --i)
+            // {
+            //     if (!this.managedItems[i].rectDirty)
+            //     {
+            //         nearestClean = i;
+            //         break;
+            //     }
+            // }
+            //
+            // // 需要更新 从 nearestClean 到 index 的尺寸
+            // Rect nearestCleanRect = this.managedItems[nearestClean].rect;
+            // Vector2 curPos = GetLeftTop(nearestCleanRect);
+            // Vector2 size = nearestCleanRect.size;
+            // this.MovePos(ref curPos, size);
+            //
+            // for (var i = nearestClean + 1; i <= index; i++)
+            // {
+            //     size = this.GetItemSize(i);
+            //     this.managedItems[i].rect = CreateWithLeftTopAndSize(curPos, size);
+            //     this.managedItems[i].rectDirty = false;
+            //     this.MovePos(ref curPos, size);
+            // }
+            //
+            // var range = new Vector2(Mathf.Abs(curPos.x), Mathf.Abs(curPos.y));
+            // switch (this.layoutType)
+            // {
+            //     case ItemLayoutType.VerticalThenHorizontal:
+            //         range.x += size.x;
+            //         range.y = this.refRect.height;
+            //         break;
+            //     case ItemLayoutType.HorizontalThenVertical:
+            //         range.x = this.refRect.width;
+            //         if (curPos.x != 0)
+            //         {
+            //             range.y += size.y;
+            //         }
+            //
+            //         break;
+            //     default:
+            //         break;
+            // }
+            //
+            // this.content.sizeDelta = range;
         }
 
         protected override void OnDestroy()
@@ -338,6 +371,8 @@ namespace AillieoUtils
             yield return new WaitForEndOfFrame();
 
             this.InternalUpdateData();
+
+            this.delayedUpdateCoroutine = null;
         }
 
         private void InternalUpdateData()
@@ -354,6 +389,8 @@ namespace AillieoUtils
             }
 
             this.CheckDataCountChange();
+
+            this.CalculateContentSizeAndItemPos();
 
             this.ResetCriticalItems();
 
@@ -758,6 +795,11 @@ namespace AillieoUtils
 
         private void InitScrollView()
         {
+            if (!Application.isPlaying)
+            {
+                return;
+            }
+
             this.initialized = true;
 
             // 根据设置来控制原ScrollRect的滚动方向
@@ -795,7 +837,11 @@ namespace AillieoUtils
             this.viewRect.GetWorldCorners(this.viewWorldConers);
             this.rectCorners[0] = this.content.transform.InverseTransformPoint(this.viewWorldConers[0]);
             this.rectCorners[1] = this.content.transform.InverseTransformPoint(this.viewWorldConers[2]);
-            this.refRect = new Rect((Vector2)this.rectCorners[0] - this.content.anchoredPosition, this.rectCorners[1] - this.rectCorners[0]);
+
+            var size = this.rectCorners[1] - this.rectCorners[0];
+            var pos = (Vector2)this.rectCorners[0] + this.content.anchoredPosition;
+
+            this.refRect = new Rect(pos, size);
         }
 
         private void MovePos(ref Vector2 pos, Vector2 size)
@@ -805,28 +851,27 @@ namespace AillieoUtils
             {
                 case ItemLayoutType.Vertical:
                     // 垂直方向 向下移动
-                    pos.y -= size.y;
+                    pos.y -= size.y + this.spacing.x;
                     break;
                 case ItemLayoutType.Horizontal:
                     // 水平方向 向右移动
-                    pos.x += size.x;
+                    pos.x += size.x + this.spacing.x;
                     break;
                 case ItemLayoutType.VerticalThenHorizontal:
-                    pos.y -= size.y;
-                    if (pos.y - size.y < -this.refRect.height)
+                    pos.y -= size.y + this.spacing.y;
+                    if (pos.y - size.y < -this.refRect.height + this.padding.bottom)
                     {
-                        pos.y = 0;
-                        pos.x += size.x;
+                        pos.y = -this.padding.top;
+                        pos.x += size.x + this.spacing.x;
                     }
 
                     break;
                 case ItemLayoutType.HorizontalThenVertical:
-
-                    pos.x += size.x;
-                    if (pos.x + size.x > this.refRect.width)
+                    pos.x += size.x + this.spacing.x;
+                    if (pos.x + size.x > this.refRect.width - this.padding.right)
                     {
-                        pos.x = 0;
-                        pos.y -= size.y;
+                        pos.x = this.padding.left;
+                        pos.y -= size.y + this.spacing.y;
                     }
 
                     break;
@@ -838,6 +883,62 @@ namespace AillieoUtils
         private void OnApplicationQuit()
         {
             applicationIsQuitting = true;
+        }
+
+        private void CalculateContentSizeAndItemPos()
+        {
+            var curPos = new Vector2(this.padding.left, -this.padding.top);
+            var maxX = float.MinValue;
+            var minY = float.MaxValue;
+
+            for (int i = 0; i < this.dataCount; i++)
+            {
+                var size = this.GetItemSize(i);
+                this.managedItems[i].rect = CreateWithLeftTopAndSize(curPos, size);
+                this.managedItems[i].rectDirty = false;
+
+                var itemRight = curPos.x + size.x;
+                var itemBottom = curPos.y - size.y;
+
+                if (itemRight > maxX)
+                {
+                    maxX = itemRight;
+                }
+
+                if (itemBottom < minY)
+                {
+                    minY = itemBottom;
+                }
+
+                this.MovePos(ref curPos, size);
+            }
+
+            var contentWidth = 0f;
+            var contentHeight = 0f;
+
+            switch (this.layoutType)
+            {
+                case ItemLayoutType.Vertical:
+                    contentWidth = this.refRect.width;
+                    contentHeight = -minY + this.padding.bottom;
+                    break;
+                case ItemLayoutType.Horizontal:
+                    contentWidth = maxX + this.padding.right;
+                    contentHeight = this.refRect.height;
+                    break;
+                case ItemLayoutType.VerticalThenHorizontal:
+                    contentWidth = maxX + this.padding.right;
+                    contentHeight = this.refRect.height;
+                    break;
+                case ItemLayoutType.HorizontalThenVertical:
+                    contentWidth = this.refRect.width;
+                    contentHeight = -minY + this.padding.bottom;
+                    break;
+                default:
+                    break;
+            }
+
+            this.content.sizeDelta = new Vector2(contentWidth, contentHeight);
         }
 
         // const int 代替 enum 减少 (int)和(CriticalItemType)转换
