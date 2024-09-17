@@ -13,7 +13,8 @@ public struct DefaultScrollItemData
     public string name;
 }
 
-public class TestScript : MonoBehaviour {
+public class TestScript : MonoBehaviour
+{
     List<DefaultScrollItemData> testData = new List<DefaultScrollItemData>();
 
     void updateFunc(int index, RectTransform item)
@@ -21,6 +22,8 @@ public class TestScript : MonoBehaviour {
         DefaultScrollItemData data = this.testData[index];
         item.gameObject.SetActive(true);
         item.transform.Find("Text").GetComponent<Text>().text = string.Format("{0}_{1}", data.name, index);
+
+        Debug.Log("");
     }
 
     void updateFunc_3(int index, RectTransform item)
@@ -84,7 +87,8 @@ public class TestScript : MonoBehaviour {
     public RectTransform templateTextItem;
     private RectTransform templateTextItemInstance;
 
-    void Start () {
+    void Start()
+    {
         this.scrollView_1.SetUpdateFunc(this.updateFunc);
         this.scrollView_1.SetItemCountFunc(this.itemCountFunc);
 
@@ -95,7 +99,7 @@ public class TestScript : MonoBehaviour {
         this.scrollView_3.SetUpdateFunc(this.updateFunc_3);
         this.scrollView_3.SetItemSizeFunc(this.itemSizeFunc_3);
         this.scrollView_3.SetItemCountFunc(this.itemCountFunc);
-        
+
         this.scrollView_4.SetUpdateFunc(this.updateFunc);
         this.scrollView_4.SetItemCountFunc(this.itemCountFunc);
 
@@ -144,20 +148,21 @@ public class TestScript : MonoBehaviour {
 
     static string GetRandomLongText()
     {
-        var rand = UnityEngine.Random.Range(1,100);
+        var rand = UnityEngine.Random.Range(1, 100);
         var stringBuilder = new StringBuilder(rand + 2);
-        do {
-            stringBuilder.Append((char)UnityEngine.Random.Range('A','Z'));
+        do
+        {
+            stringBuilder.Append((char)UnityEngine.Random.Range('A', 'Z'));
         }
-        while (--rand > 0) ;
+        while (--rand > 0);
         stringBuilder.AppendLine();
         return stringBuilder.ToString();
     }
 
     public void AddRandomData()
     {
-        var newData = new DefaultScrollItemData() { name = GetRandomSizeString(), longString = GetRandomLongText()};
-        this.testData.Insert(UnityEngine.Random.Range(0,this.testData.Count), newData);
+        var newData = new DefaultScrollItemData() { name = GetRandomSizeString(), longString = GetRandomLongText() };
+        this.testData.Insert(UnityEngine.Random.Range(0, this.testData.Count), newData);
         this.UpdateAllScrollViews();
     }
 
