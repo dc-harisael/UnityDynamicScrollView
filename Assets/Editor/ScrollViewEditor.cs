@@ -28,6 +28,8 @@ namespace AillieoUtils
         private SerializedProperty itemTemplate;
         private SerializedProperty poolSize;
         private SerializedProperty defaultItemSize;
+        private SerializedProperty padding;
+        private SerializedProperty spacing;
         private SerializedProperty layoutType;
 
         private GUIStyle cachedCaption;
@@ -143,6 +145,8 @@ namespace AillieoUtils
             this.itemTemplate = this.serializedObject.FindProperty("itemTemplate");
             this.poolSize = this.serializedObject.FindProperty("poolSize");
             this.defaultItemSize = this.serializedObject.FindProperty("defaultItemSize");
+            this.padding = this.serializedObject.FindProperty("padding");
+            this.spacing = this.serializedObject.FindProperty("spacing");
             this.layoutType = this.serializedObject.FindProperty("layoutType");
         }
 
@@ -151,6 +155,8 @@ namespace AillieoUtils
             EditorGUILayout.PropertyField(this.itemTemplate);
             EditorGUILayout.PropertyField(this.poolSize);
             EditorGUILayout.PropertyField(this.defaultItemSize);
+            EditorGUILayout.PropertyField(this.padding);
+            EditorGUILayout.PropertyField(this.spacing);
             this.layoutType.intValue = (int)(ScrollView.ItemLayoutType)EditorGUILayout.EnumPopup("layoutType", (ScrollView.ItemLayoutType)this.layoutType.intValue);
         }
 
