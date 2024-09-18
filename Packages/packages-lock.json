@@ -1,11 +1,5 @@
 {
   "dependencies": {
-    "com.aillieo.unity-dynamic-scroll-view": {
-      "version": "file:com.aillieo.unity-dynamic-scroll-view",
-      "depth": 0,
-      "source": "embedded",
-      "dependencies": {}
-    },
     "com.unity.2d.sprite": {
       "version": "1.0.0",
       "depth": 0,
