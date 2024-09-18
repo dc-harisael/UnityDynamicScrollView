@@ -1,12 +1,10 @@
 {
-    "name": "AillieoUtils.UnityDynamicScrollView.Editor",
+    "name": "AillieoUtils.UnityDynamicScrollView.Tests",
     "rootNamespace": "",
     "references": [
-        "AillieoUtils.UnityDynamicScrollView"
+        "GUID:9bff4ab8c2b0f4d2780540e2780db4ce"
     ],
-    "includePlatforms": [
-        "Editor"
-    ],
+    "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": false,
