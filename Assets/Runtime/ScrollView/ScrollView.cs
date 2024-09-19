@@ -239,7 +239,7 @@ namespace AillieoUtils
                 }
 
                 this.willUpdateData = 0;
-                this.UpdateData();
+                this.UpdateData(false);
             }
         }
 
