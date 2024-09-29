@@ -227,6 +227,11 @@ namespace AillieoUtils
 
         protected override void OnRectTransformDimensionsChange()
         {
+            if (!this.itemTemplate)
+            {
+                return;
+            }
+
             base.OnRectTransformDimensionsChange();
 
             if (Application.isPlaying)
