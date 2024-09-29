@@ -22,8 +22,6 @@ public class TestScript : MonoBehaviour
         DefaultScrollItemData data = this.testData[index];
         item.gameObject.SetActive(true);
         item.transform.Find("Text").GetComponent<Text>().text = string.Format("{0}_{1}", data.name, index);
-
-        Debug.Log("");
     }
 
     void updateFunc_3(int index, RectTransform item)
