@@ -22,8 +22,6 @@ public class TestScript : MonoBehaviour
         DefaultScrollItemData data = this.testData[index];
         item.gameObject.SetActive(true);
         item.transform.Find("Text").GetComponent<Text>().text = string.Format("{0}_{1}", data.name, index);
-
-        Debug.Log("");
     }
 
     void updateFunc_3(int index, RectTransform item)
@@ -99,6 +97,10 @@ public class TestScript : MonoBehaviour
         this.scrollView_3.SetUpdateFunc(this.updateFunc_3);
         this.scrollView_3.SetItemSizeFunc(this.itemSizeFunc_3);
         this.scrollView_3.SetItemCountFunc(this.itemCountFunc);
+        this.scrollView_3.SetItemGetAndRecycleFunc(null, rectTransform =>
+        {
+            Debug.Log("Recycle " + rectTransform.gameObject.name);
+        });
 
         this.scrollView_4.SetUpdateFunc(this.updateFunc);
         this.scrollView_4.SetItemCountFunc(this.itemCountFunc);
