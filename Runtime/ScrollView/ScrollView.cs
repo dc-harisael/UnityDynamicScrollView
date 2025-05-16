@@ -23,12 +23,6 @@ namespace AillieoUtils
         [Tooltip("item的模板")]
         public RectTransform itemTemplate;
 
-        /// <summary>
-        /// Disable the default item pool if you want to use your own pool implementation.
-        /// </summary>
-        [Tooltip("Disable default item pool")]
-        public bool disableDefaultItemPool;
-
         [Tooltip("Content padding")]
         [SerializeField]
         private RectOffset padding = new();
@@ -792,7 +786,7 @@ namespace AillieoUtils
 
         private void RecycleOldItem(RectTransform item)
         {
-            if (this.itemRecycleFunc != null && this.disableDefaultItemPool)
+            if (this.itemRecycleFunc != null)
             {
                 try
                 {

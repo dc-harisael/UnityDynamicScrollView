@@ -25,7 +25,6 @@ namespace AillieoUtils
         private static Vector2 thinElementSize = new Vector2(160f, 20f);
         private static Action<GameObject, MenuCommand> PlaceUIElementRoot;
 
-        private SerializedProperty disableDefaultItemPool;
         private SerializedProperty itemTemplate;
         private SerializedProperty poolSize;
         private SerializedProperty defaultItemSize;
@@ -143,7 +142,6 @@ namespace AillieoUtils
         {
             base.OnEnable();
 
-            this.disableDefaultItemPool = this.serializedObject.FindProperty("disableDefaultItemPool");
             this.itemTemplate = this.serializedObject.FindProperty("itemTemplate");
             this.poolSize = this.serializedObject.FindProperty("poolSize");
             this.defaultItemSize = this.serializedObject.FindProperty("defaultItemSize");
@@ -154,7 +152,6 @@ namespace AillieoUtils
 
         protected virtual void DrawConfigInfo()
         {
-            EditorGUILayout.PropertyField(this.disableDefaultItemPool);
             EditorGUILayout.PropertyField(this.itemTemplate);
             EditorGUILayout.PropertyField(this.poolSize);
             EditorGUILayout.PropertyField(this.defaultItemSize);
