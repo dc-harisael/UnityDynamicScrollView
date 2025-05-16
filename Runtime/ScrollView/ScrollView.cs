@@ -23,6 +23,9 @@ namespace AillieoUtils
 
         [HideInInspector] public bool disableDefaultItemPool;
 
+        [HideInInspector]
+        public bool disableDefaultItemPool;
+
         [Tooltip("Content padding")]
         [SerializeField]
         private RectOffset padding = new();
@@ -48,6 +51,7 @@ namespace AillieoUtils
         protected Func<int, RectTransform> itemGetFunc;
         protected Action<RectTransform> itemRecycleFunc;
 
+
         private readonly List<ScrollItemWithRect> managedItems = new List<ScrollItemWithRect>();
 
         private Rect refRect;
@@ -60,6 +64,7 @@ namespace AillieoUtils
         [Tooltip("初始化时池内item数量")]
         [SerializeField]
         private int poolSize;
+
 
         // status
         private bool initialized = false;
@@ -99,16 +104,8 @@ namespace AillieoUtils
 
         public void SetItemGetAndRecycleFunc(Func<int, RectTransform> getFunc, Action<RectTransform> recycleFunc)
         {
-            if (getFunc != null && recycleFunc != null)
-            {
-                this.itemGetFunc = getFunc;
-                this.itemRecycleFunc = recycleFunc;
-            }
-            else
-            {
-                this.itemGetFunc = null;
-                this.itemRecycleFunc = null;
-            }
+            this.itemGetFunc = getFunc;
+            this.itemRecycleFunc = recycleFunc;
         }
 
         public void ResetAllDelegates()
