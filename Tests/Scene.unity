@@ -5256,7 +5256,7 @@ MonoBehaviour:
       m_Calls: []
   defaultItemSize: {x: 100, y: 100}
   itemTemplate: {fileID: 126907133}
-  disableDefaultItemPool: 1
+  disableDefaultItemPool: 0
   padding:
     m_Left: 0
     m_Right: 0
