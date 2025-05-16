@@ -1,3 +1,10 @@
+## [1.2.1](https://github.com/dc-harisael/UnityDynamicScrollView/compare/v1.2.0...v1.2.1) (2025-05-16)
+
+
+### Bug Fixes
+
+* **scroll-view:** remove duplicate variable ([0b6bce7](https://github.com/dc-harisael/UnityDynamicScrollView/commit/0b6bce741e78efd6a83057c4b1f7709d8113450f))
+
 # [1.2.0](https://github.com/dc-harisael/UnityDynamicScrollView/compare/v1.1.0...v1.2.0) (2025-05-16)
 
 
