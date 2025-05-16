@@ -1,3 +1,10 @@
+# [1.2.0](https://github.com/dc-harisael/UnityDynamicScrollView/compare/v1.1.0...v1.2.0) (2025-05-16)
+
+
+### Features
+
+* release v1.1.1 ([9bf48ce](https://github.com/dc-harisael/UnityDynamicScrollView/commit/9bf48ce280e34015173c787cc6fcabb57f4962d9))
+
 # [1.1.0](https://github.com/tim456012/UnityDynamicScrollView/compare/v1.0.0...v1.1.0) (2024-09-29)
 
 
