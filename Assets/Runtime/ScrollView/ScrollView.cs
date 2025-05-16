@@ -17,11 +17,17 @@ namespace AillieoUtils
     [DisallowMultipleComponent]
     public class ScrollView : ScrollRect
     {
-        [Tooltip("默认item尺寸")] public Vector2 defaultItemSize;
+        [Tooltip("默认item尺寸")]
+        public Vector2 defaultItemSize;
 
-        [Tooltip("item的模板")] public RectTransform itemTemplate;
+        [Tooltip("item的模板")]
+        public RectTransform itemTemplate;
 
-        [HideInInspector] public bool disableDefaultItemPool;
+        /// <summary>
+        /// Disable the default item pool if you want to use your own pool implementation.
+        /// </summary>
+        [Tooltip("Disable default item pool")]
+        public bool disableDefaultItemPool;
 
         [Tooltip("Content padding")]
         [SerializeField]
@@ -62,9 +68,13 @@ namespace AillieoUtils
         [SerializeField]
         private int poolSize;
 
-
         // status
         private bool initialized = false;
+
+        // 0: No update needed.
+        // 1: Incremental update.
+        // 2: Full update, keep old items.
+        // 3: Full update, discard old items.
         private int willUpdateData = 0;
 
         private static readonly Vector3[] viewWorldCorners = new Vector3[4];
@@ -230,31 +240,15 @@ namespace AillieoUtils
             this.ResetCriticalItems();
         }
 
-        protected override void OnRectTransformDimensionsChange()
+        protected void EnsureItemRect(int index)
         {
-            if (!this.itemTemplate)
+            if (index < 0 || index >= this.managedItems.Count)
             {
+                Debug.LogError(
+                    $"[{nameof(this.EnsureItemRect)}]: Index {index} is out of bounds. managedItems.Count: {this.managedItems.Count}");
                 return;
             }
 
-            base.OnRectTransformDimensionsChange();
-
-            if (Application.isPlaying)
-            {
-                this.UpdateRefRect();
-
-                for (var i = 0; i < this.managedItems.Count; i++)
-                {
-                    this.managedItems[i].rectDirty = true;
-                }
-
-                this.willUpdateData = 0;
-                this.UpdateData(false);
-            }
-        }
-
-        protected void EnsureItemRect(int index)
-        {
             if (!this.managedItems[index].rectDirty)
             {
                 // 已经是干净的了
@@ -264,37 +258,57 @@ namespace AillieoUtils
             ScrollItemWithRect firstItem = this.managedItems[0];
             if (firstItem.rectDirty)
             {
-                // Vector2 firstSize = this.GetItemSize(0);
-                // firstItem.rect = CreateWithLeftTopAndSize(Vector2.zero, firstSize);
-                // firstItem.rectDirty = false;
-                this.CalculateContentSizeAndItemPos();
+                Vector2 firstSize = this.GetItemSize(0);
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+                if (firstSize.x <= 0 || firstSize.y <= 0)
+                {
+                    Debug.LogWarning($"First item's size is {firstSize}. Both x and y should be greater than 0");
+                }
+#endif
+
+                firstItem.rect = CreateWithLeftTopAndSize(new Vector2(this.padding.left, -this.padding.top), firstSize);
+                firstItem.rectDirty = false;
+
+                return;
             }
 
-            // // 当前item之前的最近的已更新的rect
-            // var nearestClean = 0;
-            // for (var i = index; i >= 0; --i)
-            // {
-            //     if (!this.managedItems[i].rectDirty)
-            //     {
-            //         nearestClean = i;
-            //         break;
-            //     }
-            // }
-            //
-            // // 需要更新 从 nearestClean 到 index 的尺寸
-            // Rect nearestCleanRect = this.managedItems[nearestClean].rect;
-            // Vector2 curPos = GetLeftTop(nearestCleanRect);
-            // Vector2 size = nearestCleanRect.size;
-            // this.MovePos(ref curPos, size);
-            //
-            // for (var i = nearestClean + 1; i <= index; i++)
-            // {
-            //     size = this.GetItemSize(i);
-            //     this.managedItems[i].rect = CreateWithLeftTopAndSize(curPos, size);
-            //     this.managedItems[i].rectDirty = false;
-            //     this.MovePos(ref curPos, size);
-            // }
-            //
+            // 当前item之前的最近的已更新的rect
+            var nearestClean = 0;
+            for (var i = index; i >= 0; --i)
+            {
+                if (!this.managedItems[i].rectDirty)
+                {
+                    nearestClean = i;
+                    break;
+                }
+            }
+
+            // Re-check
+            if (nearestClean == index && !this.managedItems[index].rectDirty)
+            {
+                return;
+            }
+
+            // 需要更新 从 nearestClean 到 index 的尺寸
+            Rect nearestCleanRect = this.managedItems[nearestClean].rect;
+            Vector2 curPos = GetLeftTop(nearestCleanRect);
+            Vector2 size = nearestCleanRect.size;
+            this.MovePos(ref curPos, size);
+
+            for (var i = nearestClean + 1; i <= index; i++)
+            {
+                Vector2 curSize = this.GetItemSize(i);
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+                if (curSize.x <= 0 || curSize.y <= 0)
+                {
+                    Debug.LogWarning($"item {i} has size {curSize}, both x and y should be greater than 0");
+                }
+#endif
+                this.managedItems[i].rect = CreateWithLeftTopAndSize(curPos, curSize);
+                this.managedItems[i].rectDirty = false;
+                this.MovePos(ref curPos, curSize);
+            }
+
             // var range = new Vector2(Mathf.Abs(curPos.x), Mathf.Abs(curPos.y));
             // switch (this.layoutType)
             // {
@@ -778,7 +792,7 @@ namespace AillieoUtils
 
         private void RecycleOldItem(RectTransform item)
         {
-            if (this.itemRecycleFunc != null)
+            if (this.itemRecycleFunc != null && this.disableDefaultItemPool)
             {
                 try
                 {
@@ -831,7 +845,7 @@ namespace AillieoUtils
             this.rectCorners[1] = this.content.transform.InverseTransformPoint(viewWorldCorners[2]);
 
             var size = this.rectCorners[1] - this.rectCorners[0];
-            var pos = (Vector2)this.rectCorners[0] + this.content.anchoredPosition;
+            var pos = (Vector2)this.rectCorners[0];
 
             this.refRect = new Rect(pos, size);
         }
@@ -866,8 +880,6 @@ namespace AillieoUtils
                         pos.y -= size.y + this.spacing.y;
                     }
 
-                    break;
-                default:
                     break;
             }
         }
