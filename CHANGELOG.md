@@ -1,3 +1,11 @@
+## [1.2.2](https://github.com/dc-harisael/UnityDynamicScrollView/compare/v1.2.1...v1.2.2) (2025-05-16)
+
+
+### Bug Fixes
+
+* change back the incremental rect update ([12daa5c](https://github.com/dc-harisael/UnityDynamicScrollView/commit/12daa5cc774d649dbe4dc1dda1fc507dc23869fe))
+* remove unused variable ([8cff2d6](https://github.com/dc-harisael/UnityDynamicScrollView/commit/8cff2d60a7963578bfe729784b597ebed52fa548))
+
 ## [1.2.1](https://github.com/dc-harisael/UnityDynamicScrollView/compare/v1.2.0...v1.2.1) (2025-05-16)
 
 
