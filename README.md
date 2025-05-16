@@ -1,5 +1,7 @@
 ## ScrollView
 
+This is a fork of [aillieo/UnityDynamicScrollView](https://github.com/aillieo/UnityDynamicScrollView) with additional features for configuring content padding and spacing between items in the scroll view.
+
 基于UGUI的动态滚动列表，主要支持以下功能：
 
 1. 继承自UGUI的`SrollRect`，支持`ScrollRect`的所有功能；
