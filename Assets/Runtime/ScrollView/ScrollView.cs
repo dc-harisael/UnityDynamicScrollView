@@ -23,6 +23,9 @@ namespace AillieoUtils
         [Tooltip("item的模板")]
         public RectTransform itemTemplate;
 
+        [HideInInspector]
+        public bool disableDefaultItemPool;
+
         [Tooltip("Content padding")]
         [SerializeField]
         private RectOffset padding = new();
@@ -48,6 +51,7 @@ namespace AillieoUtils
         protected Func<int, RectTransform> itemGetFunc;
         protected Action<RectTransform> itemRecycleFunc;
 
+
         private readonly List<ScrollItemWithRect> managedItems = new List<ScrollItemWithRect>();
 
         private Rect refRect;
@@ -60,6 +64,7 @@ namespace AillieoUtils
         [Tooltip("初始化时池内item数量")]
         [SerializeField]
         private int poolSize;
+
 
         // status
         private bool initialized = false;
@@ -99,16 +104,8 @@ namespace AillieoUtils
 
         public void SetItemGetAndRecycleFunc(Func<int, RectTransform> getFunc, Action<RectTransform> recycleFunc)
         {
-            if (getFunc != null && recycleFunc != null)
-            {
-                this.itemGetFunc = getFunc;
-                this.itemRecycleFunc = recycleFunc;
-            }
-            else
-            {
-                this.itemGetFunc = null;
-                this.itemRecycleFunc = null;
-            }
+            this.itemGetFunc = getFunc;
+            this.itemRecycleFunc = recycleFunc;
         }
 
         public void ResetAllDelegates()
@@ -227,6 +224,11 @@ namespace AillieoUtils
 
         protected override void OnRectTransformDimensionsChange()
         {
+            if (!this.itemTemplate)
+            {
+                return;
+            }
+
             base.OnRectTransformDimensionsChange();
 
             if (Application.isPlaying)
@@ -239,7 +241,7 @@ namespace AillieoUtils
                 }
 
                 this.willUpdateData = 0;
-                this.UpdateData();
+                this.UpdateData(false);
             }
         }
 
@@ -768,26 +770,16 @@ namespace AillieoUtils
 
         private RectTransform GetNewItem(int index)
         {
-            RectTransform item;
-            if (this.itemGetFunc != null)
-            {
-                item = this.itemGetFunc(index);
-            }
-            else
-            {
-                item = this.itemPool.Get();
-            }
+            RectTransform item = this.itemGetFunc != null ? this.itemGetFunc(index) : this.itemPool.Get();
 
             return item;
         }
 
         private void RecycleOldItem(RectTransform item)
         {
-            if (this.itemRecycleFunc != null)
-            {
-                this.itemRecycleFunc(item);
-            }
-            else
+            this.itemRecycleFunc?.Invoke(item);
+
+            if (!this.disableDefaultItemPool)
             {
                 this.itemPool.Recycle(item);
             }
