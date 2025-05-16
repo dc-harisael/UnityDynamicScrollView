@@ -17,14 +17,11 @@ namespace AillieoUtils
     [DisallowMultipleComponent]
     public class ScrollView : ScrollRect
     {
-        [Tooltip("默认item尺寸")]
-        public Vector2 defaultItemSize;
+        [Tooltip("默认item尺寸")] public Vector2 defaultItemSize;
 
-        [Tooltip("item的模板")]
-        public RectTransform itemTemplate;
+        [Tooltip("item的模板")] public RectTransform itemTemplate;
 
-        [HideInInspector]
-        public bool disableDefaultItemPool;
+        [HideInInspector] public bool disableDefaultItemPool;
 
         [Tooltip("Content padding")]
         [SerializeField]
@@ -79,10 +76,10 @@ namespace AillieoUtils
         public enum ItemLayoutType
         {
             // 最后一位表示滚动方向
-            Vertical = 0b0001,                   // 0001
-            Horizontal = 0b0010,                 // 0010
-            VerticalThenHorizontal = 0b0100,     // 0100
-            HorizontalThenVertical = 0b0101,     // 0101
+            Vertical = 0b0001, // 0001
+            Horizontal = 0b0010, // 0010
+            VerticalThenHorizontal = 0b0100, // 0100
+            HorizontalThenVertical = 0b0101, // 0101
         }
 
         public virtual void SetUpdateFunc(Action<int, RectTransform> func)
@@ -586,19 +583,23 @@ namespace AillieoUtils
                 if (criticalItemType == CriticalItemType.UpToHide)
                 {
                     // 最上隐藏了一个
-                    this.criticalItemIndex[criticalItemType + 2] = Mathf.Max(criticalIndex, this.criticalItemIndex[criticalItemType + 2]);
+                    this.criticalItemIndex[criticalItemType + 2] =
+                        Mathf.Max(criticalIndex, this.criticalItemIndex[criticalItemType + 2]);
                     this.criticalItemIndex[criticalItemType]++;
                 }
                 else
                 {
                     // 最下隐藏了一个
-                    this.criticalItemIndex[criticalItemType + 2] = Mathf.Min(criticalIndex, this.criticalItemIndex[criticalItemType + 2]);
+                    this.criticalItemIndex[criticalItemType + 2] =
+                        Mathf.Min(criticalIndex, this.criticalItemIndex[criticalItemType + 2]);
                     this.criticalItemIndex[criticalItemType]--;
                 }
 
-                this.criticalItemIndex[criticalItemType] = Mathf.Clamp(this.criticalItemIndex[criticalItemType], 0, this.dataCount - 1);
+                this.criticalItemIndex[criticalItemType] =
+                    Mathf.Clamp(this.criticalItemIndex[criticalItemType], 0, this.dataCount - 1);
 
-                if (this.criticalItemIndex[CriticalItemType.UpToHide] > this.criticalItemIndex[CriticalItemType.DownToHide])
+                if (this.criticalItemIndex[CriticalItemType.UpToHide] >
+                    this.criticalItemIndex[CriticalItemType.DownToHide])
                 {
                     // 偶然的情况 拖拽超出一屏
                     this.ResetCriticalItems();
@@ -625,19 +626,23 @@ namespace AillieoUtils
                 if (criticalItemType == CriticalItemType.UpToShow)
                 {
                     // 最上显示了一个
-                    this.criticalItemIndex[criticalItemType - 2] = Mathf.Min(criticalIndex, this.criticalItemIndex[criticalItemType - 2]);
+                    this.criticalItemIndex[criticalItemType - 2] =
+                        Mathf.Min(criticalIndex, this.criticalItemIndex[criticalItemType - 2]);
                     this.criticalItemIndex[criticalItemType]--;
                 }
                 else
                 {
                     // 最下显示了一个
-                    this.criticalItemIndex[criticalItemType - 2] = Mathf.Max(criticalIndex, this.criticalItemIndex[criticalItemType - 2]);
+                    this.criticalItemIndex[criticalItemType - 2] =
+                        Mathf.Max(criticalIndex, this.criticalItemIndex[criticalItemType - 2]);
                     this.criticalItemIndex[criticalItemType]++;
                 }
 
-                this.criticalItemIndex[criticalItemType] = Mathf.Clamp(this.criticalItemIndex[criticalItemType], 0, this.dataCount - 1);
+                this.criticalItemIndex[criticalItemType] =
+                    Mathf.Clamp(this.criticalItemIndex[criticalItemType], 0, this.dataCount - 1);
 
-                if (this.criticalItemIndex[CriticalItemType.UpToShow] >= this.criticalItemIndex[CriticalItemType.DownToShow])
+                if (this.criticalItemIndex[CriticalItemType.UpToShow] >=
+                    this.criticalItemIndex[CriticalItemType.DownToShow])
                 {
                     // 偶然的情况 拖拽超出一屏
                     this.ResetCriticalItems();
@@ -658,7 +663,8 @@ namespace AillieoUtils
             }
 
             this.EnsureItemRect(index);
-            return new Rect(this.refRect.position - this.content.anchoredPosition, this.refRect.size).Overlaps(this.managedItems[index].rect);
+            return new Rect(this.refRect.position - this.content.anchoredPosition, this.refRect.size).Overlaps(
+                this.managedItems[index].rect);
         }
 
         private void InitPool()
@@ -679,9 +685,8 @@ namespace AillieoUtils
                 },
                 () =>
                 {
-                    GameObject itemObj = Instantiate(this.itemTemplate.gameObject);
+                    GameObject itemObj = Instantiate(this.itemTemplate.gameObject, poolNode.transform, false);
                     RectTransform item = itemObj.GetComponent<RectTransform>();
-                    itemObj.transform.SetParent(poolNode.transform, false);
 
                     item.anchorMin = Vector2.up;
                     item.anchorMax = Vector2.up;
@@ -692,7 +697,7 @@ namespace AillieoUtils
                 },
                 (RectTransform item) =>
                 {
-                    if (!applicationIsQuitting)
+                    if (!this.applicationIsQuitting)
                     {
                         item.transform.SetParent(null, false);
                         Destroy(item.gameObject);
@@ -875,7 +880,7 @@ namespace AillieoUtils
 
         private void OnApplicationQuit()
         {
-            applicationIsQuitting = true;
+            this.applicationIsQuitting = true;
         }
 
         private void CalculateContentSizeAndItemPos()
@@ -883,6 +888,8 @@ namespace AillieoUtils
             var curPos = new Vector2(this.padding.left, -this.padding.top);
             var maxX = float.MinValue;
             var minY = float.MaxValue;
+            var contentWidth = 0f;
+            var contentHeight = 0f;
 
             for (int i = 0; i < this.dataCount; i++)
             {
@@ -896,44 +903,23 @@ namespace AillieoUtils
                 this.managedItems[i].rect = CreateWithLeftTopAndSize(curPos, size);
                 this.managedItems[i].rectDirty = false;
 
-                var itemRight = curPos.x + size.x;
-                var itemBottom = curPos.y - size.y;
-
-                if (itemRight > maxX)
-                {
-                    maxX = itemRight;
-                }
-
-                if (itemBottom < minY)
-                {
-                    minY = itemBottom;
-                }
+                maxX = Mathf.Max(maxX, curPos.x + size.x);
+                minY = Mathf.Min(minY, curPos.y - size.y);
 
                 this.MovePos(ref curPos, size);
             }
 
-            var contentWidth = 0f;
-            var contentHeight = 0f;
-
             switch (this.layoutType)
             {
                 case ItemLayoutType.Vertical:
-                    contentWidth = this.refRect.width;
-                    contentHeight = -minY + this.padding.bottom;
-                    break;
-                case ItemLayoutType.Horizontal:
-                    contentWidth = maxX + this.padding.right;
-                    contentHeight = this.refRect.height;
-                    break;
-                case ItemLayoutType.VerticalThenHorizontal:
-                    contentWidth = maxX + this.padding.right;
-                    contentHeight = this.refRect.height;
-                    break;
                 case ItemLayoutType.HorizontalThenVertical:
                     contentWidth = this.refRect.width;
                     contentHeight = -minY + this.padding.bottom;
                     break;
-                default:
+                case ItemLayoutType.Horizontal:
+                case ItemLayoutType.VerticalThenHorizontal:
+                    contentWidth = maxX + this.padding.right;
+                    contentHeight = this.refRect.height;
                     break;
             }
 
