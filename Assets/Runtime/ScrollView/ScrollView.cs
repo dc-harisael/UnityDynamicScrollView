@@ -51,7 +51,6 @@ namespace AillieoUtils
         protected Func<int, RectTransform> itemGetFunc;
         protected Action<RectTransform> itemRecycleFunc;
 
-
         private readonly List<ScrollItemWithRect> managedItems = new List<ScrollItemWithRect>();
 
         private Rect refRect;
@@ -65,12 +64,11 @@ namespace AillieoUtils
         [SerializeField]
         private int poolSize;
 
-
         // status
         private bool initialized = false;
         private int willUpdateData = 0;
 
-        private Vector3[] viewWorldConers = new Vector3[4];
+        private static readonly Vector3[] viewWorldCorners = new Vector3[4];
         private Vector3[] rectCorners = new Vector3[2];
 
         private bool applicationIsQuitting;
@@ -104,8 +102,16 @@ namespace AillieoUtils
 
         public void SetItemGetAndRecycleFunc(Func<int, RectTransform> getFunc, Action<RectTransform> recycleFunc)
         {
-            this.itemGetFunc = getFunc;
-            this.itemRecycleFunc = recycleFunc;
+            if (getFunc != null && recycleFunc != null)
+            {
+                this.itemGetFunc = getFunc;
+                this.itemRecycleFunc = recycleFunc;
+            }
+            else
+            {
+                this.itemGetFunc = null;
+                this.itemRecycleFunc = null;
+            }
         }
 
         public void ResetAllDelegates()
@@ -171,13 +177,24 @@ namespace AillieoUtils
             }
         }
 
-        // protected override void OnDisable()
-        // {
-        //     this.initialized = false;
-        //     base.OnDisable();
-        // }
+        protected override void OnDisable()
+        {
+            this.initialized = false;
+            base.OnDisable();
+        }
+
         protected virtual void InternalScrollTo(int index)
         {
+            if (this.dataCount == 0)
+            {
+                return;
+            }
+
+            if (index < 0)
+            {
+                index += this.dataCount;
+            }
+
             index = Mathf.Clamp(index, 0, this.dataCount - 1);
             this.EnsureItemRect(index);
             Rect r = this.managedItems[index].rect;
@@ -314,7 +331,10 @@ namespace AillieoUtils
             if (this.itemPool != null)
             {
                 this.itemPool.Purge();
+                this.itemPool = null;
             }
+
+            base.OnDestroy();
         }
 
         protected Rect GetItemLocalRect(int index)
@@ -327,33 +347,6 @@ namespace AillieoUtils
 
             return (Rect)default;
         }
-
-#if UNITY_EDITOR
-        protected override void OnValidate()
-        {
-            var dir = (int)this.layoutType & flagScrollDirection;
-            if (dir == 1)
-            {
-                // vertical
-                if (this.horizontalScrollbar != null)
-                {
-                    this.horizontalScrollbar.gameObject.SetActive(false);
-                    this.horizontalScrollbar = null;
-                }
-            }
-            else
-            {
-                // horizontal
-                if (this.verticalScrollbar != null)
-                {
-                    this.verticalScrollbar.gameObject.SetActive(false);
-                    this.verticalScrollbar = null;
-                }
-            }
-
-            base.OnValidate();
-        }
-#endif
 
         private static Vector2 GetLeftTop(Rect rect)
         {
@@ -405,7 +398,14 @@ namespace AillieoUtils
 
             if (this.itemCountFunc != null)
             {
-                newDataCount = this.itemCountFunc();
+                try
+                {
+                    newDataCount = this.itemCountFunc();
+                }
+                catch (Exception e)
+                {
+                    UnityEngine.Debug.LogException(e);
+                }
             }
 
             var keepOldItems = (this.willUpdateData & 2) == 0;
@@ -539,7 +539,7 @@ namespace AillieoUtils
             this.criticalItemIndex[CriticalItemType.DownToShow] = Mathf.Min(lastIndex + 1, this.dataCount - 1);
         }
 
-        private RectTransform GetCriticalItem(int type)
+        private RectTransform GetCriticalItem(byte type)
         {
             var index = this.criticalItemIndex[type];
             if (index >= 0 && index < this.dataCount)
@@ -558,7 +558,7 @@ namespace AillieoUtils
             {
                 dirty = false;
 
-                for (int i = CriticalItemType.UpToHide; i <= CriticalItemType.DownToShow; i++)
+                for (byte i = CriticalItemType.UpToHide; i <= CriticalItemType.DownToShow; i++)
                 {
                     if (i <= CriticalItemType.DownToHide)
                     {
@@ -574,7 +574,7 @@ namespace AillieoUtils
             }
         }
 
-        private bool CheckAndHideItem(int criticalItemType)
+        private bool CheckAndHideItem(byte criticalItemType)
         {
             RectTransform item = this.GetCriticalItem(criticalItemType);
             var criticalIndex = this.criticalItemIndex[criticalItemType];
@@ -611,7 +611,7 @@ namespace AillieoUtils
             return false;
         }
 
-        private bool CheckAndShowItem(int criticalItemType)
+        private bool CheckAndShowItem(byte criticalItemType)
         {
             RectTransform item = this.GetCriticalItem(criticalItemType);
             var criticalIndex = this.criticalItemIndex[criticalItemType];
@@ -661,44 +661,13 @@ namespace AillieoUtils
             return new Rect(this.refRect.position - this.content.anchoredPosition, this.refRect.size).Overlaps(this.managedItems[index].rect);
         }
 
-        private bool ShouldItemFullySeenAtIndex(int index)
-        {
-            if (index < 0 || index >= this.dataCount)
-            {
-                return false;
-            }
-
-            this.EnsureItemRect(index);
-            return this.IsRectContains(new Rect(this.refRect.position - this.content.anchoredPosition, this.refRect.size), this.managedItems[index].rect);
-        }
-
-        private bool IsRectContains(Rect outRect, Rect inRect, bool bothDimensions = false)
-        {
-            if (bothDimensions)
-            {
-                var xContains = (outRect.xMax >= inRect.xMax) && (outRect.xMin <= inRect.xMin);
-                var yContains = (outRect.yMax >= inRect.yMax) && (outRect.yMin <= inRect.yMin);
-                return xContains && yContains;
-            }
-            else
-            {
-                var dir = (int)this.layoutType & flagScrollDirection;
-                if (dir == 1)
-                {
-                    // 垂直滚动 只计算y向
-                    return (outRect.yMax >= inRect.yMax) && (outRect.yMin <= inRect.yMin);
-                }
-                else
-                {
-                    // = 0
-                    // 水平滚动 只计算x向
-                    return (outRect.xMax >= inRect.xMax) && (outRect.xMin <= inRect.xMin);
-                }
-            }
-        }
-
         private void InitPool()
         {
+            if (this.itemPool != null)
+            {
+                return;
+            }
+
             var poolNode = new GameObject("POOL");
             poolNode.SetActive(false);
             poolNode.transform.SetParent(this.transform, false);
@@ -741,7 +710,14 @@ namespace AillieoUtils
         {
             if (this.updateFunc != null)
             {
-                this.updateFunc(index, item);
+                try
+                {
+                    this.updateFunc(index, item);
+                }
+                catch (Exception e)
+                {
+                    UnityEngine.Debug.LogException(e);
+                }
             }
 
             this.SetPosForItemAtIndex(item, index);
@@ -761,7 +737,14 @@ namespace AillieoUtils
             {
                 if (this.itemSizeFunc != null)
                 {
-                    return this.itemSizeFunc(index);
+                    try
+                    {
+                        return this.itemSizeFunc(index);
+                    }
+                    catch (Exception e)
+                    {
+                        UnityEngine.Debug.LogException(e);
+                    }
                 }
             }
 
@@ -770,16 +753,44 @@ namespace AillieoUtils
 
         private RectTransform GetNewItem(int index)
         {
-            RectTransform item = this.itemGetFunc != null ? this.itemGetFunc(index) : this.itemPool.Get();
+            RectTransform item;
+            if (this.itemGetFunc != null)
+            {
+                try
+                {
+                    item = this.itemGetFunc(index);
+                    item.anchorMin = Vector2.up;
+                    item.anchorMax = Vector2.up;
+                    item.pivot = Vector2.zero;
+                }
+                catch (Exception e)
+                {
+                    Debug.LogException(e);
+                    item = null;
+                }
+            }
+            else
+            {
+                item = this.itemPool.Get();
+            }
 
             return item;
         }
 
         private void RecycleOldItem(RectTransform item)
         {
-            this.itemRecycleFunc?.Invoke(item);
-
-            if (!this.disableDefaultItemPool)
+            if (this.itemRecycleFunc != null)
+            {
+                try
+                {
+                    this.itemRecycleFunc(item);
+                }
+                catch (Exception e)
+                {
+                    Debug.LogException(e);
+                }
+            }
+            else
             {
                 this.itemPool.Recycle(item);
             }
@@ -811,24 +822,14 @@ namespace AillieoUtils
         // refRect是在Content节点下的 viewport的 rect
         private void UpdateRefRect()
         {
-            /*
-             *  WorldCorners
-             *
-             *    1 ------- 2
-             *    |         |
-             *    |         |
-             *    0 ------- 3
-             *
-             */
-
             if (!CanvasUpdateRegistry.IsRebuildingLayout())
             {
                 Canvas.ForceUpdateCanvases();
             }
 
-            this.viewRect.GetWorldCorners(this.viewWorldConers);
-            this.rectCorners[0] = this.content.transform.InverseTransformPoint(this.viewWorldConers[0]);
-            this.rectCorners[1] = this.content.transform.InverseTransformPoint(this.viewWorldConers[2]);
+            this.viewRect.GetWorldCorners(viewWorldCorners);
+            this.rectCorners[0] = this.content.transform.InverseTransformPoint(viewWorldCorners[0]);
+            this.rectCorners[1] = this.content.transform.InverseTransformPoint(viewWorldCorners[2]);
 
             var size = this.rectCorners[1] - this.rectCorners[0];
             var pos = (Vector2)this.rectCorners[0] + this.content.anchoredPosition;
@@ -886,6 +887,12 @@ namespace AillieoUtils
             for (int i = 0; i < this.dataCount; i++)
             {
                 var size = this.GetItemSize(i);
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+                if (size.x <= 0 || size.y <= 0)
+                {
+                    Debug.LogWarning($"item {i} size is {size}, both x and y should be greater than 0");
+                }
+#endif
                 this.managedItems[i].rect = CreateWithLeftTopAndSize(curPos, size);
                 this.managedItems[i].rectDirty = false;
 
