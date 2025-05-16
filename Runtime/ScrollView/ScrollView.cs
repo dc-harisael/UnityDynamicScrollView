@@ -23,9 +23,6 @@ namespace AillieoUtils
 
         [HideInInspector] public bool disableDefaultItemPool;
 
-        [HideInInspector]
-        public bool disableDefaultItemPool;
-
         [Tooltip("Content padding")]
         [SerializeField]
         private RectOffset padding = new();
