@@ -851,7 +851,7 @@ namespace AillieoUtils
             {
                 case ItemLayoutType.Vertical:
                     // 垂直方向 向下移动
-                    pos.y -= size.y + this.spacing.x;
+                    pos.y -= size.y + this.spacing.y;
                     break;
                 case ItemLayoutType.Horizontal:
                     // 水平方向 向右移动
