@@ -135,7 +135,7 @@ namespace AillieoUtils
 
             this.reloadFlag = false;
 
-            if (((int)this.layoutType & FlagScrollDirection) == 1)
+            if (((int)this.layoutType & flagScrollDirection) == 1)
             {
                 // 垂直滚动 只计算y向
                 if (delta.y < 0)
