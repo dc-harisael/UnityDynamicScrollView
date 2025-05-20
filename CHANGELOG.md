@@ -1,3 +1,20 @@
+# [2.0.0](https://github.com/dc-harisael/UnityDynamicScrollView/compare/v1.2.2...v2.0.0) (2025-05-20)
+
+
+### Bug Fixes
+
+* typo of spacing value ([b938e2e](https://github.com/dc-harisael/UnityDynamicScrollView/commit/b938e2efb4775a0c1bbb7cb2e176cb86049c082f))
+
+
+### Features
+
+* implement new layout type ([2f9403d](https://github.com/dc-harisael/UnityDynamicScrollView/commit/2f9403df8fdc75f544029fd3a21290738faae41d))
+
+
+### BREAKING CHANGES
+
+* Moved several logics to partial file "ScrollView.Internal.cs" for separate concern.
+
 ## [1.2.2](https://github.com/dc-harisael/UnityDynamicScrollView/compare/v1.2.1...v1.2.2) (2025-05-16)
 
 
