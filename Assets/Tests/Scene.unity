@@ -569,7 +569,6 @@ MonoBehaviour:
       m_Calls: []
   defaultItemSize: {x: 150, y: 100}
   itemTemplate: {fileID: 126907133}
-  disableDefaultItemPool: 0
   padding:
     m_Left: 0
     m_Right: 0
@@ -1632,7 +1631,6 @@ MonoBehaviour:
       m_Calls: []
   defaultItemSize: {x: 0, y: 0}
   itemTemplate: {fileID: 1059412467}
-  disableDefaultItemPool: 0
   padding:
     m_Left: 0
     m_Right: 0
@@ -1849,7 +1847,6 @@ MonoBehaviour:
       m_Calls: []
   defaultItemSize: {x: 0, y: 0}
   itemTemplate: {fileID: 1059412467}
-  disableDefaultItemPool: 0
   padding:
     m_Left: 0
     m_Right: 0
@@ -2655,7 +2652,6 @@ MonoBehaviour:
       m_Calls: []
   defaultItemSize: {x: 300, y: 100}
   itemTemplate: {fileID: 1274671586}
-  disableDefaultItemPool: 0
   padding:
     m_Left: 0
     m_Right: 0
@@ -3304,7 +3300,6 @@ MonoBehaviour:
       m_Calls: []
   defaultItemSize: {x: 150, y: 100}
   itemTemplate: {fileID: 126907133}
-  disableDefaultItemPool: 0
   padding:
     m_Left: 0
     m_Right: 0
@@ -3745,7 +3740,6 @@ MonoBehaviour:
       m_Calls: []
   defaultItemSize: {x: 100, y: 100}
   itemTemplate: {fileID: 126907133}
-  disableDefaultItemPool: 0
   padding:
     m_Left: 24
     m_Right: 24
@@ -5256,7 +5250,6 @@ MonoBehaviour:
       m_Calls: []
   defaultItemSize: {x: 100, y: 100}
   itemTemplate: {fileID: 126907133}
-  disableDefaultItemPool: 0
   padding:
     m_Left: 0
     m_Right: 0
@@ -5810,7 +5803,6 @@ MonoBehaviour:
       m_Calls: []
   defaultItemSize: {x: 300, y: 100}
   itemTemplate: {fileID: 1274671586}
-  disableDefaultItemPool: 0
   padding:
     m_Left: 0
     m_Right: 0
