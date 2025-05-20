@@ -267,10 +267,16 @@ namespace AillieoUtils
 #endif
                 var contentHeight = this.content.sizeDelta.y;
 
-                firstItem.rect = this.layoutType == ItemLayoutType.VerticalBottomUp
-                    ? CreateWithLeftTopAndSize(
-                        new Vector2(this.padding.left, contentHeight - this.padding.top), firstSize)
-                    : CreateWithLeftTopAndSize(new Vector2(this.padding.left, -this.padding.top), firstSize);
+                if (this.layoutType == ItemLayoutType.VerticalBottomUp)
+                {
+                    firstItem.rect = CreateWithLeftTopAndSize(
+                        new Vector2(this.padding.left, contentHeight - this.padding.top), firstSize);
+                }
+                else
+                {
+                    firstItem.rect =
+                        CreateWithLeftTopAndSize(new Vector2(this.padding.left, -this.padding.top), firstSize);
+                }
 
                 firstItem.rectDirty = false;
                 return;
