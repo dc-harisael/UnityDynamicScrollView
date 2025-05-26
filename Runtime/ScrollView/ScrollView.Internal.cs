@@ -118,6 +118,11 @@ namespace AillieoUtils
 
         private void InitPool()
         {
+            if (this.itemGetFunc != null && this.itemRecycleFunc != null)
+            {
+                return;
+            }
+
             if (this.itemPool != null)
             {
                 return;
