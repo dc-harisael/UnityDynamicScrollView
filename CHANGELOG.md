@@ -1,3 +1,10 @@
+## [2.0.1](https://github.com/dc-harisael/UnityDynamicScrollView/compare/v2.0.0...v2.0.1) (2025-05-26)
+
+
+### Bug Fixes
+
+* add condition to disable default object pool ([c541122](https://github.com/dc-harisael/UnityDynamicScrollView/commit/c5411226413ba070ba20bb690be49bad9f1511f1))
+
 # [2.0.0](https://github.com/dc-harisael/UnityDynamicScrollView/compare/v1.2.2...v2.0.0) (2025-05-20)
 
 
