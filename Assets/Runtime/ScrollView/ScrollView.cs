@@ -20,21 +20,20 @@ namespace AillieoUtils
         [Tooltip("默认item尺寸")]
         public Vector2 defaultItemSize;
 
-        [Tooltip("item的模板")]
-        public RectTransform itemTemplate;
+        [Tooltip("item的模板")] public RectTransform itemTemplate;
 
         [Tooltip("Content padding")]
         [SerializeField]
-        private RectOffset padding = new();
+        public RectOffset padding = new();
 
         [Tooltip("Space between items")]
         [SerializeField]
-        private Vector2 spacing = Vector2.zero;
+        public Vector2 spacing = Vector2.zero;
 
         /// <summary>
         /// Bitmask for scroll direction
         /// </summary>
-        protected const int FlagScrollDirection = 1;  // 0001
+        protected const int FlagScrollDirection = 1; // 0001
 
         [SerializeField]
         [FormerlySerializedAs("m_layoutType")]
