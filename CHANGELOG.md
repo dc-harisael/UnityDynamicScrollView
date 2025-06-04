@@ -1,3 +1,11 @@
+## [2.0.2](https://github.com/dc-harisael/UnityDynamicScrollView/compare/v2.0.1...v2.0.2) (2025-06-04)
+
+
+### Bug Fixes
+
+* change padding and spacing field to public ([36d4fce](https://github.com/dc-harisael/UnityDynamicScrollView/commit/36d4fce10393532f7adeb60267bd4d15cbbf6d95))
+* update condition logic for pool init ([89634cf](https://github.com/dc-harisael/UnityDynamicScrollView/commit/89634cf1a726fcc214a1e433da78df8bef491f88))
+
 ## [2.0.1](https://github.com/dc-harisael/UnityDynamicScrollView/compare/v2.0.0...v2.0.1) (2025-05-26)
 
 
